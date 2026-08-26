@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project Evaluation System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+
+    <!-- Top Navigation Header -->
+    <header class="top-nav">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="brand-text">
+                <span class="title">EvalAI</span>
+                <span class="subtitle">C++ Project Evaluation System</span>
+            </div>
+        </div>
+        <div class="nav-right" id="userBar" style="display: none;">
+            <div class="user-info">
+                <span class="user-badge" id="roleBadge">Faculty</span>
+                <span class="user-name" id="userNameDisplay">Dr. Alan Smith</span>
+            </div>
+            <button class="btn btn-outline" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+        </div>
+    </header>
+
+    <!-- AUTH CONTAINER (Login / Register) -->
+    <div class="auth-wrapper" id="authContainer">
+        <div class="auth-card glass-panel">
+            <div class="auth-header">
+                <div class="logo-circle"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h2>Welcome to EvalAI</h2>
+                <p>Intelligent Project Evaluation & Grading System</p>
+            </div>
+
+            <!-- Role Selector Tabs -->
+            <div class="role-tabs">
+                <button class="role-tab active" data-role="faculty" id="tabFaculty"><i class="fa-solid fa-user-tie"></i> Faculty Login</button>
+                <button class="role-tab" data-role="student" id="tabStudent"><i class="fa-solid fa-user-graduate"></i> Student Login</button>
+            </div>
+
+            <!-- Demo Fill Helper -->
+            <div class="demo-pills">
+                <span>Quick Demo Accounts:</span>
+                <button class="pill-btn" id="demoFacultyBtn"><i class="fa-solid fa-bolt"></i> Fill Faculty (prof_smith)</button>
+                <button class="pill-btn" id="demoStudentBtn"><i class="fa-solid fa-bolt"></i> Fill Student (alex_student)</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <label><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+            </form>
+
+            <div class="auth-footer">
+                <span>Don't have an account?</span>
+                <a href="#" id="toggleRegisterLink">Create New Account</a>
+            </div>
+        </div>
+
+        <!-- Register Form (Hidden by default) -->
+        <div class="auth-card glass-panel" id="registerCard" style="display: none;">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Register as Student or Faculty</p>
+            </div>
+            <form id="registerForm" class="auth-form">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regFullName" placeholder="e.g. Dr. Jane Doe or Alex Johnson" required>
+                </div>
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a unique username" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Enter password" required>
+                </div>
+                <div class="input-group">
+                    <label>Select Role</label>
+                    <select id="regRole">
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success btn-block"><i class="fa-solid fa-user-plus"></i> Register Account</button>
+            </form>
+            <div class="auth-footer">
+                <a href="#" id="toggleLoginLink"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD WRAPPER -->
+    <div class="app-container" id="appDashboard" style="display: none;">
+
+        <!-- STUDENT DASHBOARD VIEW -->
+        <div class="dashboard-view" id="studentDashboard" style="display: none;">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Student Portal</h1>
+                    <p>Enroll in courses, submit projects, and track AI & Faculty grades.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="openEnrollModalBtn"><i class="fa-solid fa-plus-circle"></i> Enroll in Course</button>
+                    <button class="btn btn-success" id="openSubmitModalBtn"><i class="fa-solid fa-upload"></i> Submit New Project</button>
+                </div>
+            </div>
+
+            <!-- Student Summary Cards -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stuCourseCount">0</span>
+                        <span class="stat-label">Enrolled Courses</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-file-code"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stuSubCount">0</span>
+                        <span class="stat-label">Submitted Projects</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-award"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stuGradedCount">0</span>
+                        <span class="stat-label">Evaluated Projects</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Enrolled Courses List -->
+            <div class="section-card glass-panel">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-layer-group"></i> My Course Enrollments</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Faculty</th>
+                                <th>Course Code</th>
+                                <th>Status</th>
+                                <th>Date Requested</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentEnrollmentTable">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section 2: Submitted Projects & Grades -->
+            <div class="section-card glass-panel">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-folder-open"></i> My Project Submissions & AI Evaluations</h3>
+                </div>
+                <div id="studentSubmissionsList" class="projects-grid">
+                    <!-- Project Cards Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- FACULTY DASHBOARD VIEW -->
+        <div class="dashboard-view" id="facultyDashboard" style="display: none;">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Faculty Analytics & Evaluation Hub</h1>
+                    <p>Manage courses, approve student enrollments, evaluate with AI, and chat with AI to finalize grades.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="openCreateCourseModalBtn"><i class="fa-solid fa-folder-plus"></i> Create New Course</button>
+                    <button class="btn btn-excel" id="exportExcelBtn"><i class="fa-solid fa-file-excel"></i> Export Grades (Excel/CSV)</button>
+                </div>
+            </div>
+
+            <!-- Faculty KPI Analytics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="kpiEnrolled">0</span>
+                        <span class="stat-label">Total Enrolled Students</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-file-arrow-up"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="kpiSubmitted">0</span>
+                        <span class="stat-label">Total Submissions</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="kpiPending">0</span>
+                        <span class="stat-label">Pending Evaluations</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="kpiRatio">0%</span>
+                        <span class="stat-label">Submission Ratio</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon icon-gold"><i class="fa-solid fa-star"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="kpiAvgScore">0.0</span>
+                        <span class="stat-label">Class Average Score</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grades Overview Distribution Banner -->
+            <div class="analytics-banner glass-panel">
+                <div class="banner-title">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Grades Overview & Score Distribution</h3>
+                </div>
+                <div class="distribution-bars">
+                    <div class="dist-item">
+                        <div class="dist-label">Grade A (85 - 100)</div>
+                        <div class="dist-bar-wrapper"><div class="dist-bar bar-green" id="barA" style="width: 0%;"></div></div>
+                        <div class="dist-count" id="countA">0</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-label">Grade B (70 - 84)</div>
+                        <div class="dist-bar-wrapper"><div class="dist-bar bar-blue" id="barB" style="width: 0%;"></div></div>
+                        <div class="dist-count" id="countB">0</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-label">Grade C (50 - 69)</div>
+                        <div class="dist-bar-wrapper"><div class="dist-bar bar-yellow" id="barC" style="width: 0%;"></div></div>
+                        <div class="dist-count" id="countC">0</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-label">Fail (< 50)</div>
+                        <div class="dist-bar-wrapper"><div class="dist-bar bar-red" id="barFail" style="width: 0%;"></div></div>
+                        <div class="dist-count" id="countFail">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Enrollment Requests Section -->
+            <div class="section-card glass-panel">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-user-clock"></i> Pending Enrollment Requests</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Username</th>
+                                <th>Subject</th>
+                                <th>5-Digit Code</th>
+                                <th>Requested Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facultyEnrollmentRequestsTable">
+                            <!-- Requests Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Student Submissions Roster & Evaluation Queue -->
+            <div class="section-card glass-panel">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-clipboard-check"></i> Student Submissions Roster</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student</th>
+                                <th>Project Title</th>
+                                <th>PDF Document</th>
+                                <th>Code Verification</th>
+                                <th>Submitted Date</th>
+                                <th>AI Status</th>
+                                <th>Final Score</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facultySubmissionsTable">
+                            <!-- Submissions Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL 1: ENROLL IN COURSE (Student) -->
+    <div class="modal" id="enrollModal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-link"></i> Enroll in Course</h3>
+                <button class="close-btn" class="closeModalBtn">&times;</button>
+            </div>
+            <form id="enrollForm">
+                <div class="input-group">
+                    <label>Select Available Course</label>
+                    <select id="enrollCourseSelect" required>
+                        <!-- Options loaded dynamically -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Enter 5-Digit Special Faculty Code</label>
+                    <input type="text" id="enrollCodeInput" maxlength="5" placeholder="e.g. 84920" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send Enrollment Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: SUBMIT PROJECT (Student) -->
+    <div class="modal" id="submitModal">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-arrow-up"></i> Submit Project PDF & Details</h3>
+                <button class="close-btn" class="closeModalBtn">&times;</button>
+            </div>
+            <form id="submitProjectForm">
+                <div class="input-group">
+                    <label>Select Course</label>
+                    <select id="submitCourseSelect" required></select>
+                </div>
+                <div class="input-group">
+                    <label>Project Title</label>
+                    <input type="text" id="subTitle" placeholder="e.g. AI-Driven Medical Risk Predictor" required>
+                </div>
+                <div class="input-group">
+                    <label>Project Description</label>
+                    <textarea id="subDescription" rows="3" placeholder="Brief summary of your project..." required></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Enter 5-Digit Special Verification Code</label>
+                    <input type="text" id="subCode" maxlength="5" placeholder="5-digit code provided by faculty" required>
+                </div>
+                <div class="input-group">
+                    <label>Upload PDF Document / Full PDF Content</label>
+                    <input type="file" id="subPdfFile" accept=".pdf,.txt">
+                    <small class="help-text">Select your PDF file or paste full project report contents below (including literature comparison, code snippets, modules & outputs):</small>
+                    <textarea id="subPdfText" rows="6" placeholder="Paste full PDF text or code report here if file upload is unavailable..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success btn-block"><i class="fa-solid fa-paper-plane"></i> Submit Project to Faculty</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CREATE COURSE (Faculty) -->
+    <div class="modal" id="createCourseModal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-plus"></i> Create New Course</h3>
+                <button class="close-btn" class="closeModalBtn">&times;</button>
+            </div>
+            <form id="createCourseForm">
+                <div class="input-group">
+                    <label>Subject Name</label>
+                    <input type="text" id="newSubjectName" placeholder="e.g. Deep Learning & Computer Vision" required>
+                </div>
+                <div class="input-group">
+                    <label>Create Custom 5-Digit Special Code</label>
+                    <div class="code-input-wrapper">
+                        <input type="text" id="newCourseCode" maxlength="5" placeholder="5-digit numeric code" required>
+                        <button type="button" class="btn btn-outline" id="generateCodeBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto Generate</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Publish Course</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: FULL PROJECT EVALUATION & AI CHAT HUB (Faculty) -->
+    <div class="modal" id="evalHubModal">
+        <div class="modal-content glass-panel modal-xl">
+            <div class="modal-header">
+                <div>
+                    <h3 id="evalModalTitle"><i class="fa-solid fa-microchip"></i> Project Evaluation & AI Dialogue Hub</h3>
+                    <p id="evalModalSubtitle" class="sub-text">Student: Alex Johnson | Special Code: 84920</p>
+                </div>
+                <button class="close-btn" class="closeModalBtn">&times;</button>
+            </div>
+
+            <div class="eval-hub-grid">
+
+                <!-- Column 1: PDF Viewer & Full Content Inspection -->
+                <div class="eval-column pdf-column">
+                    <div class="col-header">
+                        <h4><i class="fa-solid fa-file-pdf"></i> PDF Document Content Inspector</h4>
+                        <span class="badge badge-info" id="pdfFilenameBadge">Project_Report.pdf</span>
+                    </div>
+                    <div class="pdf-content-box" id="pdfContentDisplay">
+                        <!-- Full extracted PDF content rendered here -->
+                    </div>
+                </div>
+
+                <!-- Column 2: Online Rubrics Evaluator & AI Control -->
+                <div class="eval-column rubrics-column">
+                    <div class="col-header">
+                        <h4><i class="fa-solid fa-sliders"></i> Rubrics Evaluation Panel</h4>
+                        <button class="btn btn-ai" id="triggerAiEvalBtn"><i class="fa-solid fa-robot"></i> Evaluate using AI</button>
+                    </div>
+
+                    <div id="aiLoadingBar" class="ai-loader" style="display: none;">
+                        <div class="spinner"></div>
+                        <span>AI Engine is parsing full PDF content & analyzing rubrics...</span>
+                    </div>
+
+                    <form id="facultyEvalForm">
+
+                        <!-- Rubric 1 -->
+                        <div class="rubric-box">
+                            <div class="rubric-header">
+                                <span class="r-title">1. Existing Project Check & Novelty</span>
+                                <span class="r-score" id="r1Value">25 / 30</span>
+                            </div>
+                            <p class="r-desc">Not existing (25-30) | Existing + extra features (20-25) | Existing no diff (15-20)</p>
+                            <input type="range" id="r1Slider" min="15" max="30" value="25" class="slider">
+                            <textarea id="r1Feedback" rows="2" placeholder="Feedback on novelty & existing system comparison..."></textarea>
+                        </div>
+
+                        <!-- Rubric 2 -->
+                        <div class="rubric-box">
+                            <div class="rubric-header">
+                                <span class="r-title">2. Code Quality & Techniques</span>
+                                <span class="r-score" id="r2Value">25 / 30</span>
+                            </div>
+                            <p class="r-desc">Efficient & clean code (25-30) | Satisfiable code quality (15-24)</p>
+                            <input type="range" id="r2Slider" min="15" max="30" value="25" class="slider">
+                            <textarea id="r2Feedback" rows="2" placeholder="Feedback on code snippets & techniques..."></textarea>
+                        </div>
+
+                        <!-- Rubric 3 -->
+                        <div class="rubric-box">
+                            <div class="rubric-header">
+                                <span class="r-title">3. Modules & Output</span>
+                                <span class="r-score" id="r3Value">15 / 20</span>
+                            </div>
+                            <p class="r-desc">Good modules & outputs (15-20) | OK (10-15) | Below average (<10)</p>
+                            <input type="range" id="r3Slider" min="0" max="20" value="15" class="slider">
+                            <textarea id="r3Feedback" rows="2" placeholder="Feedback on system modules & outputs..."></textarea>
+                        </div>
+
+                        <!-- Rubric 4 -->
+                        <div class="rubric-box">
+                            <div class="rubric-header">
+                                <span class="r-title">4. Documentation & Scope</span>
+                                <span class="r-score" id="r4Value">15 / 20</span>
+                            </div>
+                            <p class="r-desc">Good documentation & scope (15-20) | OK (10-15) | Inadequate (<10)</p>
+                            <input type="range" id="r4Slider" min="0" max="20" value="15" class="slider">
+                            <textarea id="r4Feedback" rows="2" placeholder="Feedback on report layout & project scope..."></textarea>
+                        </div>
+
+                        <!-- Total Score Card -->
+                        <div class="total-score-card">
+                            <div>
+                                <span class="total-title">Total Calculated Marks</span>
+                                <span class="pass-status" id="totalPassStatus">PASS (>=50)</span>
+                            </div>
+                            <div class="score-display" id="totalScoreDisplay">80 / 100</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-block"><i class="fa-solid fa-check-double"></i> Save Faculty Evaluation</button>
+                    </form>
+                </div>
+
+                <!-- Column 3: Faculty & AI Interactive Chat Room -->
+                <div class="eval-column chat-column">
+                    <div class="col-header">
+                        <h4><i class="fa-solid fa-comments"></i> Faculty & AI Discussion Room</h4>
+                        <span class="badge badge-ai"><i class="fa-solid fa-robot"></i> AI Co-Evaluator</span>
+                    </div>
+
+                    <div class="chat-messages-container" id="chatBox">
+                        <!-- Chat history dynamically rendered -->
+                    </div>
+
+                    <form id="chatForm" class="chat-input-form">
+                        <input type="text" id="chatInput" placeholder="Ask AI why it evaluated or suggest score adjustments..." required>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+                    
+                    <button class="btn btn-gold btn-block" id="finalizeGradeBtn" style="margin-top: 10px;">
+                        <i class="fa-solid fa-lock"></i> Finalize & Publish Final Marks
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: STUDENT RESULT VIEW MODAL -->
+    <div class="modal" id="studentResultModal">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-award"></i> Evaluation Results & Detailed Feedback</h3>
+                <button class="close-btn" class="closeModalBtn">&times;</button>
+            </div>
+            <div id="studentResultBody">
+                <!-- Result breakdown rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
