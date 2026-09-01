@@ -185,13 +185,28 @@
         <div class="dashboard-view" id="facultyDashboard" style="display: none;">
             <div class="dashboard-header">
                 <div>
-                    <h1>Faculty Analytics & Evaluation Hub</h1>
-                    <p>Manage courses, approve student enrollments, evaluate with AI, and chat with AI to finalize grades.</p>
+                    <h1 id="facultyWelcomeText">Faculty Analytics & Evaluation Hub</h1>
+                    <p id="facultyDateDisplay" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i>
+                        <span></span>
+                        <span style="color: var(--text-dim);">|</span>
+                        <i class="fa-solid fa-clock" style="color: var(--secondary);"></i>
+                        <span id="facultyLiveClock"></span>
+                    </p>
                 </div>
                 <div class="header-actions">
                     <button class="btn btn-primary" id="openCreateCourseModalBtn"><i class="fa-solid fa-folder-plus"></i> Create New Course</button>
-                    <button class="btn btn-excel" id="exportExcelBtn"><i class="fa-solid fa-file-excel"></i> Export Grades (Excel/CSV)</button>
+                    <button class="btn btn-outline" id="manageCoursesBtn"><i class="fa-solid fa-gear"></i> Manage Courses</button>
+                    <button class="btn btn-excel" id="exportExcelBtn"><i class="fa-solid fa-file-excel"></i> Export Grades</button>
                 </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="document.getElementById('openCreateCourseModalBtn').click()"><i class="fa-solid fa-folder-plus"></i> New Course</button>
+                <button class="quick-action-btn" onclick="document.getElementById('manageCoursesBtn').click()"><i class="fa-solid fa-gear"></i> Manage Courses</button>
+                <button class="quick-action-btn" onclick="document.getElementById('exportExcelBtn').click()"><i class="fa-solid fa-file-excel"></i> Export Grades</button>
+                <button class="quick-action-btn" id="refreshDashBtn"><i class="fa-solid fa-arrows-rotate"></i> Refresh Data</button>
             </div>
 
             <!-- Faculty KPI Analytics Grid -->
@@ -286,10 +301,28 @@
                 </div>
             </div>
 
+            <!-- Activity Log -->
+            <div class="section-card glass-panel activity-panel">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-timeline"></i> Recent Activity</h3>
+                    <button class="btn btn-outline btn-sm" id="clearActivityBtn"><i class="fa-solid fa-broom"></i> Clear</button>
+                </div>
+                <ul class="activity-list" id="activityList">
+                    <li class="empty-state" style="padding: 24px;">
+                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 28px; color: var(--text-dim);"></i>
+                        <p>No recent activity yet.</p>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Student Submissions Roster & Evaluation Queue -->
             <div class="section-card glass-panel">
                 <div class="section-title">
                     <h3><i class="fa-solid fa-clipboard-check"></i> Student Submissions Roster</h3>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="submissionsSearchInput" placeholder="Search by student, project, or code...">
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="custom-table">
@@ -528,6 +561,35 @@
             </div>
             <div id="studentResultBody">
                 <!-- Result breakdown rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Custom Confirm Dialog -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-icon" id="confirmIcon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h4 id="confirmTitle">Are you sure?</h4>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button class="btn btn-outline" id="confirmCancelBtn"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                <button class="btn btn-primary" id="confirmOkBtn"><i class="fa-solid fa-check"></i> Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Course Modal -->
+    <div class="modal" id="manageCoursesModal">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-gear"></i> Manage Your Courses</h3>
+                <button class="close-btn closeModalBtn">&times;</button>
+            </div>
+            <div id="courseManageList" class="course-manage-list">
+                <!-- Populated via JS -->
             </div>
         </div>
     </div>
